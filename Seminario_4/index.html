@@ -15,6 +15,7 @@
   </head>
   <body>
     <ul id="messages"></ul>
+    <ul id="typing"></ul>
     <form action="">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
@@ -26,9 +27,24 @@
       
       if (person == null || person == "") {
           txt = "El usuario no ha elegido un nombre";
+          alert(txt);
+          socket.emit('nombre persona', person);
       } else {
-          txt = "";
+          socket.emit('nombre persona', person);
       }
+
+      window.onkeydown = function(e){
+        socket.emit('escribiendo', person);
+      }
+
+      socket.on('typing', function(msg){
+        $('#typing').append($('<li>').text(msg));
+      });
+
+      socket.on('stop typing', function(person){
+        $("#typing li:contains(" + person + ")").remove();
+      });
+
     </script>
     <script>
       var socket = io();
