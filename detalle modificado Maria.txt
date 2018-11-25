@@ -1,0 +1,15 @@
+SEM05 ZMQ
+
+forum.js-> lo modificado estan entre // comentarios.
+
+dm_remote.js-> 
+
+var sep =... ->añadido
+client.on-> modificado
+Cambiadas las funciones.
+
+
+dm_client.js-> modificado entero
+
+
+dm_server.js-> lo modificado estan entre // comentarios.
