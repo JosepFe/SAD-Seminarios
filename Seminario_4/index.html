@@ -16,26 +16,33 @@
   <body>
     <ul id="messages"></ul>
     <ul id="typing"></ul>
+    <ul id="users"></ul>
     <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
+      <input id="m" autocomplete="off" onfocus="activarFoco()" onfocusout="desctivarFoco()"/><button>Send</button>
     </form>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io();
-      var person = prompt("Escoje un nombre", "Ejemplo");
+      var person = "";
       
-      if (person == null || person == "") {
-          txt = "El usuario no ha elegido un nombre";
-          alert(txt);
-          socket.emit('nombre persona', person);
-      } else {
-          socket.emit('nombre persona', person);
+      while(person == null || person == ""){
+        person = prompt("Escoje un nombre", "Ejemplo");
+        if(person == null || person == ""){
+          alert("Debes elegir un nombre para utilizar el foro");
+        }
+      }
+      socket.emit('nombre persona', person);
+      
+      function activarFoco(){
+        socket.emit('escribiendo', person)
       }
 
-      window.onkeydown = function(e){
-        socket.emit('escribiendo', person);
+      function desctivarFoco(){
+        socket.emit('ha dejado de escribir', person)
       }
+
+
 
       socket.on('typing', function(msg){
         $('#typing').append($('<li>').text(msg));
@@ -43,6 +50,11 @@
 
       socket.on('stop typing', function(person){
         $("#typing li:contains(" + person + ")").remove();
+      });
+
+      socket.on('user list', function(list){
+        $('#users li').remove();
+        $('#users').append($('<li>').text(list));
       });
 
     </script>
