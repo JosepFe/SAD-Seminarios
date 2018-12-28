@@ -58,6 +58,7 @@ io.on("connection", function(socket) {
       );
 
       socket.to(idTo).emit("chat mensaje", personName + ":" + message);
+      socket.emit("chat mensaje", personName + ":" + message);
     } else {
       console.log("El mensaje publico de " + personName + " es : " + msg);
       io.emit("chat mensaje", personName + ": " + msg);
