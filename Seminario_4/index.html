@@ -60,13 +60,8 @@
     <script>
       var socket = io();
       var person = "";
-      while (person == null || person == "") {
-        person = prompt("Escoje un nombre", "Ejemplo");
-        if (person == null || person == "") {
-          alert("Debes elegir un nombre para utilizar el foro");
-        }
-      }
-      socket.emit("nombre persona", person);
+
+      obtenerNickName("Debes elegir un nombre para utilizar el foro");
 
       function activarFoco() {
         socket.emit("escribiendo", person);
@@ -76,27 +71,43 @@
         socket.emit("ha dejado de escribir", person);
       }
 
-      socket.on("typing", function(msg) {
+      socket.on("usuario repetido", function() {
+        obtenerNickName("Nombre de usuario ya existente, porfavor introduzca otro diferente");
+      });
+
+      socket.on("escribiendo", function(msg) {
         $("#typing").append($("<li>").text(msg));
       });
 
-      socket.on("stop typing", function(person) {
+      socket.on("fin escribiendo", function(person) {
         $("#typing li:contains(" + person + ")").remove();
       });
 
-      socket.on("user list", function(list) {
+      socket.on("lista usuarios", function(list) {
         $("#users li").remove();
         $("#users").append($("<li>").text(list));
       });
+
+      function obtenerNickName(msg) {
+        person = "";
+        alert(msg);
+        while (person == null || person == "") {
+          person = prompt("Escoje un nombre", "Ejemplo");
+          if (person == null || person == "") {
+            alert(msg);
+          }
+        }
+        socket.emit("usuario conectado", person);
+      }
     </script>
     <script>
       var socket = io();
       $("form").submit(function() {
-        socket.emit("chat message", $("#m").val());
+        socket.emit("chat mensaje", $("#m").val());
         $("#m").val("");
         return false;
       });
-      socket.on("chat message", function(msg) {
+      socket.on("chat mensaje", function(msg) {
         $("#messages").append($("<li>").text(msg));
       });
     </script>

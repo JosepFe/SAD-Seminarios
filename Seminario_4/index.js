@@ -12,47 +12,61 @@ var users = [];
 
 io.on("connection", function(socket) {
   var personName;
-  console.log("a user connected with id" + socket.id);
 
   socket.on("disconnect", function() {
-    console.log("user disconnected");
+    if (personName != undefined) {
+      var peopleOnlineIndex = peopleOnline.indexOf(personName);
+      if (peopleOnlineIndex > -1) {
+        peopleOnline.splice(peopleOnlineIndex, 1);
+      }
 
-    var index = peopleOnline.indexOf(personName);
-    if (index > -1) {
-      peopleOnline.splice(index, 1);
+      var usersIndex = findIndexWithAttr(
+        users,
+        "name",
+        personName.toLowerCase()
+      );
+      if (usersIndex > -1) {
+        users.splice(usersIndex, 1);
+      }
+
+      console.log(
+        "usuarios conectados al desconectarse " +
+          personName +
+          ": " +
+          JSON.stringify(users)
+      );
+      io.emit("lista usuarios", "Usuarios online: " + peopleOnline);
+      socket.emit("fin escribiendo", personName);
+      socket.broadcast.emit("chat mensaje", "Se ha desconectado " + personName);
     }
-    io.emit("user list", peopleOnline);
-    socket.emit("stop typing", personName);
-    socket.broadcast.emit("chat message", "Se ha desconectado " + personName);
   });
 
-  socket.on("chat message", function(msg) {
+  socket.on("chat mensaje", function(msg) {
     if (msg.charAt(0) == "%") {
-
       var aux = msg.split("%");
-      var nameTo = aux[1];
+      var nameTo = aux[1].toLowerCase();
       var message = aux[2];
       var idTo = "";
 
-      users.forEach(user => {
-        if (user[0] == nameTo) {
-          idTo = user[1];
+      var id = users.forEach(user => {
+        if (user.name == nameTo) {
+          idTo = user.id;
         }
       });
       console.log(
-        "el mensaje de " + personName + " para " + nameTo + " es : " + message
+        "El mensaje de " + personName + " para " + nameTo + " es : " + message
       );
 
-      socket.to(idTo).emit("chat message", personName + ":" + message);
+      socket.to(idTo).emit("chat mensaje", personName + ":" + message);
     } else {
-      console.log("el mensaje publico de " + personName + " es : " + message);
-      io.emit("chat message", personName + ": " + msg);
+      console.log("El mensaje publico de " + personName + " es : " + msg);
+      io.emit("chat mensaje", personName + ": " + msg);
     }
   });
 
   socket.on("escribiendo", function(person) {
     if (!peopleTyping.includes(person)) {
-      socket.broadcast.emit("typing", person + " is typing");
+      socket.broadcast.emit("escribiendo", person + " esta escribiendo");
       peopleTyping.push(person);
     }
   });
@@ -61,21 +75,47 @@ io.on("connection", function(socket) {
     var index = peopleTyping.indexOf(person);
     if (index > -1) {
       peopleTyping.splice(index, 1);
-      io.emit("stop typing", person);
+      io.emit("fin escribiendo", person);
     }
   });
 
-  socket.on("nombre persona", function(person) {
-    var persona = [person, socket.id];
-    users.push(persona);
-    peopleOnline.push(person);
-    console.log(users);
-    personName = person;
-    socket.broadcast.emit("chat message", "Se ha conectado " + person);
-    io.emit("user list", peopleOnline);
+  socket.on("usuario conectado", function(person) {
+    var existeUsuario = users.find(user => user.name == person.toLowerCase());
+
+    if (existeUsuario != null || existeUsuario != undefined) {
+      socket.emit("usuario repetido");
+    } else {
+      var persona = new Object();
+      persona.name = person.toLowerCase();
+      persona.id = socket.id;
+
+      users.push(persona);
+      peopleOnline.push(person);
+
+      console.log(
+        "usuarios conectados al conectarse " +
+          person +
+          ": " +
+          JSON.stringify(users)
+      );
+
+      personName = person;
+
+      socket.broadcast.emit("chat mensaje", "Se ha conectado " + person);
+      io.emit("lista usuarios", "Usuarios online: " + peopleOnline);
+    }
   });
 });
 
 http.listen(3000, function() {
   console.log("listening on *:3000");
 });
+
+function findIndexWithAttr(array, attr, value) {
+  for (var i = 0; i < array.length; i += 1) {
+    if (array[i][attr] === value) {
+      return i;
+    }
+  }
+  return -1;
+}
