@@ -13,6 +13,3 @@ socket.on("message", function(topic, msg) {
   console.log("Received: " + msg + " for " + topic);
   req.send(name);
 });
-
-
-//socket.send();
