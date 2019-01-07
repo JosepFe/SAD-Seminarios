@@ -15,15 +15,29 @@ setInterval(function() {
 }, 300);
 
 rep.on("message", function(data) {
-  //console.log(data.toString());
   rep.send("message", "ACK");
-  if (!auxListWorkers.includes(data.toString())) {
-    auxListWorkers.push(data.toString());
+  if (!auxListWorkers.includes(JSON.parse(data))) {
+    auxListWorkers.push(JSON.parse(data));
   }
 });
 
 setInterval(function() {
-  listWorkers = newListWorkers;
-  newListWorkers = [];
+  listWorkers.forEach(function(element1){
+    var b = JSON.parse(element1);
+
+    //buscar alternativa con encontrar diferencuia entre dos arrays(de objetos json)
+    auxListWorkers.forEach(function(element2){
+      var e = JSON.parse(element2);
+      if(!b.name == e.name){
+        console.log("holaaa")
+      }
+    });
+
+    //mirar quien tiene una tarea == "";
+    //notificar al worker con tarea vacia que tiene que hacer la nueva tarea
+  });
+
+  listWorkers = auxListWorkers;
+  auxListWorkers = [];
   console.log(listWorkers);
 }, 400);

@@ -11,5 +11,10 @@ var name = process.argv[2];
 
 socket.on("message", function(topic, msg) {
   console.log("Received: " + msg + " for " + topic);
-  req.send(name);
+  var a = new Object();
+  a.name = name;
+  a.tarea = "add user";
+  var sender = JSON.stringify(a);
+  console.log(sender)
+  req.send(JSON.stringify(sender));
 });
