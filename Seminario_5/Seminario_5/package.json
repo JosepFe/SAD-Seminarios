@@ -1,0 +1,22 @@
+{
+  "name": "seminario_5",
+  "version": "1.0.0",
+  "description": "package for seminary 5",
+  "main": "s5.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JosepFe/SAD-Seminarios.git"
+  },
+  "author": "JOSEP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JosepFe/SAD-Seminarios/issues"
+  },
+  "homepage": "https://github.com/JosepFe/SAD-Seminarios#readme",
+  "dependencies": {
+    "zmq": "^2.15.3"
+  }
+}
